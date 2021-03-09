@@ -113,7 +113,7 @@ export class GerritCI {
   /** Remember to call gerritCi.end() to close the process */
   runSingleChange(gerritId: string) {
     console.log('Running pipeline for: ' + gerritId);
-    const {ciPatchset, patchset} =
+    const {ciPatchset, isApproved, patchset} =
         this.gerritApiService.getReviewById(gerritId);
 
     // check if need review (never run || diff patchset)
@@ -124,9 +124,13 @@ export class GerritCI {
       // run CI
       const {message, hasError} = this.executePipeline();
 
+      // is error vote -1, if approved do not vote else +1
+      const voteField = hasError ? {vote: -1} : {vote: 1};
+      const vote = isApproved ? {} : voteField;
+
       if (!this.gerritConfiguration.dryRun) {
         this.gerritApiService.postReviewCommentById(
-            gerritId, patchset, {message, vote: hasError ? -1 : 1});
+            gerritId, patchset, {message, ...vote});
       }
 
       return {message, hasError};

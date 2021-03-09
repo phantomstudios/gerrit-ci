@@ -15,6 +15,7 @@ export interface ReviewListItem {
 
 interface ReviewDetailsPayload {
   messages: {_revision_number: number}[];
+  labels: {'Code-Review': {approved?: {}}};
 }
 
 /** Review Details */
@@ -22,6 +23,7 @@ export interface GerritReview {
   /** The latest patchet the CI has been executed. */
   ciPatchset?: string;
   id: string;
+  isApproved: boolean;
   noRunFlag?: boolean;
   patchset: string;
 }
@@ -32,12 +34,13 @@ export interface GerritComment {
   patch_set: string;
 }
 
-function constructReviewCommentBody(message: string, vote: -1|1): string {
+function constructReviewCommentBody(message: string, vote?: -1|1): string {
   const ciMessage = `${CI_MAGIC_STRING} ${message}`;
+  const voteField = vote ? {'labels': {'Code-Review': vote}} : {};
 
   return JSON.stringify({
     'drafts': 'PUBLISH_ALL_REVISIONS',
-    'labels': {'Code-Review': vote},
+    ...voteField,
     'ignore_automatic_attention_set_rules': true,
     'add_to_attention_set': [],
     'remove_from_attention_set': [],
@@ -71,12 +74,13 @@ export class GerritApiService {
         commentList.find(({message}) => message.includes(CI_MAGIC_STRING));
 
     // Get last patchset from the review details
-    const {messages} = curl.get(detailsUrl) as ReviewDetailsPayload;
-    const [{_revision_number: patchset}] = messages.reverse();
+    const {labels, messages} = curl.get(detailsUrl) as ReviewDetailsPayload;
+    const lastRevisionMessage = (messages|| []).reverse()[0];
 
     return {
+      isApproved: !!(labels || {})['Code-Review']?.approved,
       ciPatchset: lastCiComment?.patch_set,
-      patchset: String(patchset),
+      patchset: String(lastRevisionMessage?._revision_number || 1),
       id: gerritId,
     };
   }
@@ -96,7 +100,7 @@ export class GerritApiService {
 
   postReviewCommentById(gerritId: string, patchset: string, {message, vote}: {
     message: string,
-    vote: -1|1
+    vote?: -1|1
   }) {
     const url = this.constructReviewPostRequestUrl(gerritId, patchset);
     // construct the post body based on comment and vote

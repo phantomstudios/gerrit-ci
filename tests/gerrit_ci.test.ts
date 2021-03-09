@@ -148,3 +148,22 @@ test('comments and votes -1 when the pipeline fails', () => {
       gerritApiStub.postReviewCommentById, '12345', '1',
       {message: expectedMessage, vote: -1});
 });
+
+test('Does not add a vote when pipeline succeed on an approved review', () => {
+  const gerritCI = new GerritCI({
+    repositoryUrl: 'https://gerrit.googlesource.com/project',
+    targetBranch: 'master',
+    pipeline: ['npm run build'],
+  });
+
+  execSyncStub.returns({toString: () => 'yay!'});
+  gerritApiStub.getReviewById.returns({isApproved: true, patchset: '1'});
+  gerritCI.runSingleChange('12345');
+
+  const expectedMessage = DEFAULT_SUCCESS_MESSAGE('npm run build');
+
+  sinon.assert.calledWith(execSyncStub, 'npm run build');
+  sinon.assert.calledWithExactly(
+      gerritApiStub.postReviewCommentById, '12345', '1',
+      {message: expectedMessage});
+});
