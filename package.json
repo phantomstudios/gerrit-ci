@@ -24,6 +24,9 @@
     "include": ["src"],
     "check-coverage": true
   },
+  "publishConfig": {
+    "registry": "https://npm.phntms.com"
+  },
   "author": "marucci@google.com",
   "license": "ISC",
   "devDependencies": {
