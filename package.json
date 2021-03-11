@@ -29,7 +29,7 @@
   "publishConfig": {
     "registry": "https://npm.phntms.com"
   },
-  "author": "marucci@google.com",
+  "author": "alessio@phntms.com",
   "license": "ISC",
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
