@@ -94,7 +94,7 @@ export class GerritCI {
     //     this.gerritConfiguration.repositoryPath || DEFAULT_REPOSITORY_PATH));
 
     const reviewList = this.gerritApiService.getReviewList(
-        this.gerritConfiguration.targetBranch,
+        this.gerritConfiguration.targetBranch || '',
         this.gerritConfiguration.filterBranch,
         this.gerritConfiguration.sizeList || DEFAULT_LIST_SIZE);
 
@@ -111,7 +111,7 @@ export class GerritCI {
   }
 
   /** Remember to call gerritCi.end() to close the process */
-  runSingleChange(gerritId: string) {
+  runSingleChange(gerritId: string): {message: string, hasError: boolean}|void {
     console.log('Running pipeline for: ' + gerritId);
     const {ciPatchset, isApproved, patchset} =
         this.gerritApiService.getReviewById(gerritId);

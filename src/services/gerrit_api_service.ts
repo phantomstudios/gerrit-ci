@@ -107,7 +107,7 @@ export class GerritApiService {
 
     const body = constructReviewCommentBody(message, vote);
     // TODO(marucci): if errors, log this in a file
-    const output = curl.post(url, body);
+    curl.post(url, body);
   }
 
   /** The URL for the project list */
