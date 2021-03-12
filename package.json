@@ -11,6 +11,7 @@
     "prepublish": "rm -rf dist && mkdir dist && cp -r src index.ts package.json *.md dist",
     "publish": "npm publish dist/"
   },
+  "type": "module",
   "ava": {
     "extensions": [
       "ts"
@@ -23,7 +24,9 @@
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript",
     "all": true,
-    "include": ["src"],
+    "include": [
+      "src"
+    ],
     "check-coverage": true
   },
   "publishConfig": {
@@ -42,6 +45,6 @@
     "sinon": "^9.2.4",
     "source-map-support": "^0.5.19",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.2"
+    "typescript": "^4.2.3"
   }
 }
