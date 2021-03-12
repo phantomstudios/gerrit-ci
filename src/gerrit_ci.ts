@@ -117,7 +117,7 @@ export class GerritCI {
         this.gerritApiService.getReviewById(gerritId);
 
     // check if need review (never run || diff patchset)
-    if (!ciPatchset || ciPatchset < patchset) {
+    if (this.gerritConfiguration.dryRun || !ciPatchset || ciPatchset < patchset) {
       // git checkout gerrit.id
       git.checkout(this.gerritInstance, this.projectName, gerritId, patchset)
 
