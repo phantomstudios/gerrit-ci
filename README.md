@@ -3,36 +3,23 @@ A CI solution for Gerrit projects.
 
 Runs a list of commands against Gerrit reviews and it sends back the response as comment and vote (+1/-1). It authenticates as the user running the command.
 
+## Getting Started
+You can easily integrate the CI in your **existing project** or setup the CI as a **standalone project**, perhaps handling multiple repositories in one place.
+
 ## Installation
 ```
 npm install @phantom/gerrit-ci
 ```
-
-## Initial setup
-The actual project setup is not handled by the CI which expects the project to already be initialised.
-By default, the CI expects the project to be in the `./repo` folder ready to build. The path is configurable (please see the `repositoryPath` option).
-
-
-This means that initially you will need to `git clone` or copy your project folder into the `./repo` folder and run all the command needed to install its requirements to run (e.g. `npm install`  and co).
-
-<u>Once the project is set, you are ready to go!</u>
-
-### Example of a CI project structure
-
-```
-- project_ci/
-    |-- node_modules/
-    |-- repo/
-    | index.ts
-    | package.json
-```
-
-## Usage
+## Integrate the CI into your project
+Create a script that imports the library and runs the CI.
 ```bash
-$ ts-node index.ts
+# Using javascript
+node gerrit_ci.js
+# Using Typescript
+ts-node gerrit_ci.ts
 ```
 ```typescript
-// index.ts
+// gerrit_ci.(js|ts)
 import {GerritCI} from '@phantom/gerrit-ci';
 
 const gerritCI = new GerritCI({
@@ -43,6 +30,79 @@ const gerritCI = new GerritCI({
 });
 
 gerritCI.run();
+```
+
+## Working on a project while running the CI
+The Gerrit CI checks out the single CRs and runs the commands specified in the pipeline in series. As a result, this can not run while also working on the project.
+
+Because of it, if you happen to also work on that project, you may copy or git clone the project on a separate folder so the CI execution does not interfer with the dev work.
+
+```bash
+# Copy your existing project in a separate folder for the CI execution
+$ cp -r ~/projects/your-project ~/projects/your-project-ci
+```
+
+## Use it as a Standalone Project
+
+### Initial setup
+The actual project setup is not handled by the CI which expects the project to already be initialised.
+By default, the CI expects the project to be in the `./repo` folder ready to build. The path is configurable (please see the `repositoryPath` option).
+
+
+This means that initially you will need to `git clone` or copy your project folder into the `./repo` folder and run all the command needed to install its requirements to run (e.g. `npm install`  and co).
+
+<u>Once the project is set, you are ready to go!</u>
+
+#### Example of a CI project structure
+
+```
+- project_ci/
+    |-- node_modules/
+    |-- repo/
+    | index.ts
+    | package.json
+```
+
+
+### Run on multiple projects
+```typescript
+// index.ts
+import {GerritCI} from '@phantom/gerrit-ci';
+
+const fooGerritCI = new GerritCI({
+  repositoryUrl: 'https://android.googlesource.com/kernel/common/',
+  repositoryPath: './kernel-common/',
+  targetBranch: 'master',
+
+  pipeline: ['npm run build', 'npm test'],
+});
+
+const barGerritCI = new GerritCI({
+  repositoryUrl: 'https://android.googlesource.com/kernel/bar/',
+  repositoryPath: './kernel-bar/',
+  targetBranch: 'master',
+
+  pipeline: ['npm run build', 'npm test'],
+});
+
+fooGerritCI.run();
+barGerritCI.run();
+```
+
+### Run a single change
+```typescript
+// npm start ${GERRIT_ID}
+const gerritId = process.argv.slice(2)[0];
+
+if (gerritId) {
+  // npm start ${GERRIT_ID} --force
+  const isForceFlag = (arg) => ['--force', '-f'].includes(arg);
+  const forceExecution = process.argv.slice(2).some(isForceFlag);
+
+  gerritCI.runSingleChange(gerritId, forceExecution);
+} else {
+  gerritCI.run();
+}
 ```
 
 ## Running on a CronJob using PM2
@@ -82,6 +142,27 @@ Documentation https://pm2.keymetrics.io/docs/usage/log-management/
 # Display only `foo-gerrit-ci` application logs
 pm2 logs foo-gerrit-ci
 ```
+
+### Integrate PM2 in your project
+As a cherry on the cake, you could have PM2 as a project dependency.
+```
+npm install pm2@latest --save-dev
+```
+
+```json
+"scripts": {
+  // ...
+  "ci:start": "pm2 start ecosystem.config.json",
+  "ci:stop": "pm2 delete ecosystem.config.json",
+
+  // With some seasoning in your script you could also:
+  // Run against a single CR [$ npm run ci:exec -- $GERRIT_ID]
+  "ci:exec": "ts-node gerrit_ci.js",
+  // Overrides the previous CI result [npm run ci:override -- $GERRIT_ID]
+  "ci:override": "ts-node gerrit_ci.js --force"
+}
+```
+
 # Configuration
 
 | Property      | Description |

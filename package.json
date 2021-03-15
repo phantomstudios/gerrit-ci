@@ -8,8 +8,9 @@
     "test": "ava",
     "test:watch": "ava --watch",
     "coverage": "nyc npm run test",
-    "prepublish": "rm -rf dist && mkdir dist && cp -r src index.ts package.json *.md dist",
-    "publish": "npm publish dist/"
+    "build": "rm -rf dist && tsc",
+    "package": "cp -r package.json *.md dist/",
+    "lib:publish": "npm run build && npm run package && npm publish dist/"
   },
   "type": "module",
   "ava": {
