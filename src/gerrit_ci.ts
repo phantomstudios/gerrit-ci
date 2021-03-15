@@ -5,7 +5,6 @@ import {GerritApiService} from './services/gerrit_api_service';
 import * as git from './services/git_service';
 import {createTaskObject, TaskObject} from './task_object';
 
-const DEFAULT_REPOSITORY_PATH = './repo';
 const DEFAULT_LIST_SIZE = 25;
 
 export interface GerritCIConfiguration {
@@ -75,8 +74,9 @@ export class GerritCI {
     checkConfigurationObject(this.gerritConfiguration);
 
     // ensure we run from the repo folder
-    process.chdir(
-        this.gerritConfiguration.repositoryPath || DEFAULT_REPOSITORY_PATH);
+    if (this.gerritConfiguration.repositoryPath) {
+      process.chdir(this.gerritConfiguration.repositoryPath);
+    }
 
     const [_match, instance, projectName] = this.extractRepositorySegments();
 
