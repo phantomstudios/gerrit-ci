@@ -111,13 +111,14 @@ export class GerritCI {
   }
 
   /** Remember to call gerritCi.end() to close the process */
-  runSingleChange(gerritId: string): {message: string, hasError: boolean}|void {
+  runSingleChange(gerritId: string, forceExecution = false):
+      {message: string, hasError: boolean}|void {
     console.log('Running pipeline for: ' + gerritId);
     const {ciPatchset, isApproved, patchset} =
         this.gerritApiService.getReviewById(gerritId);
 
     // check if need review (never run || diff patchset)
-    if (this.gerritConfiguration.dryRun || !ciPatchset || ciPatchset < patchset) {
+    if (forceExecution || !ciPatchset || ciPatchset < patchset) {
       // git checkout gerrit.id
       git.checkout(this.gerritInstance, this.projectName, gerritId, patchset)
 
