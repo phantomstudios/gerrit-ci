@@ -127,7 +127,7 @@ export class GerritCI {
 
       // is error vote -1, if approved do not vote else +1
       const voteField = hasError ? {vote: -1} : {vote: 1};
-      const vote = isApproved ? {} : voteField;
+      const vote = isApproved && !hasError ? {} : voteField;
 
       if (!this.gerritConfiguration.dryRun) {
         this.gerritApiService.postReviewCommentById(
