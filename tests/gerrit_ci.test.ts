@@ -43,6 +43,23 @@ test('errors when the "repositoryUrl" is in a wrong format', (t) => {
   t.is(error.message, expectedError);
 });
 
+test('accepts a repositoryUrl which name having dash separator', () => {
+  const gerritCI = new GerritCI({
+    repositoryUrl: 'https://gerrit-code.googlesource.com/project/',
+    targetBranch: 'master',
+    pipeline: []
+  });
+
+  gerritApiStub.getReviewById.returns({patchset: '1'});
+  gerritCI.runSingleChange('12345');
+
+
+  sinon.assert.calledWith(gerritApiStub.getReviewById, '12345');
+  sinon.assert.calledWith(
+      gitCheckoutSpy, 'gerrit-code', 'project', '12345', '1');
+  sinon.assert.calledWith(gerritApiStub.postReviewCommentById, '12345', '1');
+});
+
 test('runs a single review when no ciPatchset is set', () => {
   const gerritCI = new GerritCI({
     repositoryUrl: 'https://gerrit.googlesource.com/project',

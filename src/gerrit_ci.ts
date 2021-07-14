@@ -161,7 +161,7 @@ export class GerritCI {
   }
 
   private extractRepositorySegments() {
-    const match = /https:\/\/(\w+)[\.\w+]+\/(.+)\/{0,1}/g.exec(
+    const match = /https:\/\/([\w'-]+)[\.\w+]+\/(.+)\/{0,1}/g.exec(
         this.gerritConfiguration.repositoryUrl);
 
     if (!match) throw new ExtractionError(EXTRACTION_ERROR_MSG);
