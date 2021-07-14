@@ -31,7 +31,7 @@ test('curl.post request is contructed correctly', () => {
 
   sinon.assert.calledWith(
       execSyncStub,
-      `curl --silent -b ~/.gitcookies -X POST `+
-      `-H "Content-Type: application/json" -d '{"expected": "data"}' `+
-      `https://website.com/post/`);
+      `curl --silent -b ~/.gitcookies -X POST ` +
+          `-H "Content-Type: application/json" --globoff -d '{"expected": "data"}' ` +
+          `https://website.com/post/`);
 })

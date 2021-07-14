@@ -18,6 +18,7 @@ export function post(url: string, serialisedData: string) {
   const options = '-H "Content-Type: application/json"';
 
   return execSync(
-             `${curlCommand} -X POST ${options} -d '${serialisedData}' ${url}`)
+             `${curlCommand} -X POST ${options}` +
+             ` --globoff -d '${serialisedData}' ${url}`)
       .toString('utf-8');
 }
