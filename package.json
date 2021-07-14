@@ -12,7 +12,6 @@
     "package": "cp -r package.json *.md dist/",
     "lib:publish": "npm run build && npm run package && npm publish dist/"
   },
-  "type": "module",
   "ava": {
     "extensions": [
       "ts"
