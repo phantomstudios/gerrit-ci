@@ -14,7 +14,7 @@ function getMessage<T>(taskMessage: unknown, defaultMessage = ''): T {
 
 export interface TaskObject {
   command: string;
-  errorMessage?: string|((error: Error) => string);
+  errorMessage?: string|((error: any) => string);
   successMessage?: string|((output: string) => string);
 }
 
