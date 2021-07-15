@@ -1,4 +1,4 @@
-import {execSync} from 'child_process';
+import {execSync, spawnSync} from 'child_process';
 
 function parseJsonResponse(textResponse: string): unknown {
   const antiHijack = ')]}\'\n';
@@ -9,16 +9,16 @@ function parseJsonResponse(textResponse: string): unknown {
 const curlCommand = 'curl --silent -b ~/.gitcookies';
 
 export function get(url: string) {
-  const output = execSync(`${curlCommand} ${url}`);
+  const {stdout} =
+      spawnSync(`${curlCommand} "${url}"`, {encoding: 'utf-8', shell: true});
 
-  return parseJsonResponse(output.toString('utf-8'));
+  return parseJsonResponse(stdout);
 }
 
 export function post(url: string, serialisedData: string) {
   const options = '-H "Content-Type: application/json"';
 
   return execSync(
-             `${curlCommand} -X POST ${options}` +
-             ` --globoff -d '${serialisedData}' ${url}`)
-      .toString('utf-8');
+      `${curlCommand} -X POST ${options} -d '${serialisedData}' ${url}`,
+      {encoding: 'utf-8'});
 }

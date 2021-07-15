@@ -3,8 +3,10 @@ import rewiremock from 'rewiremock';
 import * as sinon from 'sinon';
 
 const execSyncStub = sinon.stub().returns('{}');
+const spawnSyncStub = sinon.stub().returns({stdout: '{}'});
 
-rewiremock('child_process').with({execSync: execSyncStub});
+rewiremock('child_process')
+    .with({execSync: execSyncStub, spawnSync: spawnSyncStub});
 
 rewiremock.enable();
 import {get, post} from '../../src/services/curl_service';
@@ -14,14 +16,16 @@ test('curl.get is called and parses the anti hiJack', () => {
   get('https://website.com/get/');
 
   sinon.assert.calledWith(
-      execSyncStub, 'curl --silent -b ~/.gitcookies https://website.com/get/');
+      spawnSyncStub,
+      'curl --silent -b ~/.gitcookies "https://website.com/get/"',
+      {shell: true, encoding: 'utf-8'});
 });
 
 test('curl.get parses a response with the antiHiJack', ({deepEqual}) => {
   const antihijack = ')]}\'\n';
   const expectedOutput = {expected: 'output'};
 
-  execSyncStub.returns(antihijack + JSON.stringify(expectedOutput));
+  spawnSyncStub.returns({stdout: antihijack + JSON.stringify(expectedOutput)});
 
   deepEqual(get('https://website.com/get/'), expectedOutput);
 });
@@ -32,6 +36,6 @@ test('curl.post request is contructed correctly', () => {
   sinon.assert.calledWith(
       execSyncStub,
       `curl --silent -b ~/.gitcookies -X POST ` +
-          `-H "Content-Type: application/json" --globoff -d '{"expected": "data"}' ` +
+          `-H "Content-Type: application/json" -d '{"expected": "data"}' ` +
           `https://website.com/post/`);
 })
