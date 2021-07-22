@@ -8,7 +8,7 @@ You can easily integrate the CI in your **existing project** or setup the CI as 
 
 ## Installation
 ```
-npm install @phantom/gerrit-ci
+npm install @phntms/gerrit-ci
 ```
 ## Integrate the CI into your project
 Create a script that imports the library and runs the CI.
@@ -20,7 +20,7 @@ ts-node gerrit_ci.ts
 ```
 ```typescript
 // gerrit_ci.(js|ts)
-import {GerritCI} from '@phantom/gerrit-ci';
+import {GerritCI} from '@phntms/gerrit-ci';
 
 const gerritCI = new GerritCI({
   repositoryUrl: 'https://android.googlesource.com/kernel/common/',
@@ -67,7 +67,7 @@ This means that initially you will need to `git clone` or copy your project fold
 ### Run on multiple projects
 ```typescript
 // index.ts
-import {GerritCI} from '@phantom/gerrit-ci';
+import {GerritCI} from '@phntms/gerrit-ci';
 
 const fooGerritCI = new GerritCI({
   repositoryUrl: 'https://android.googlesource.com/kernel/common/',
