@@ -11,7 +11,7 @@
     "coverage": "nyc npm run test",
     "build": "rm -rf dist && tsc",
     "package": "cp -r package.json *.md dist/",
-    "publish-npm": "npm run build && npm run package && npm publish dist/"
+    "prepublishOnly": "npm run build && npm run package"
   },
   "ava": {
     "extensions": [
