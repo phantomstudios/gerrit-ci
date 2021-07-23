@@ -17,7 +17,7 @@ test('curl.get is called and parses the anti hiJack', () => {
 
   sinon.assert.calledWith(
       spawnSyncStub,
-      'curl --silent -b ~/.gitcookies "https://website.com/get/"',
+      'curl --silent -b `git config http.cookiefile` "https://website.com/get/"',
       {shell: true, encoding: 'utf-8'});
 });
 
@@ -35,7 +35,7 @@ test('curl.post request is contructed correctly', () => {
 
   sinon.assert.calledWith(
       execSyncStub,
-      `curl --silent -b ~/.gitcookies -X POST ` +
+      'curl --silent -b `git config http.cookiefile` -X POST ' +
           `-H "Content-Type: application/json" -d '{"expected": "data"}' ` +
-          `https://website.com/post/`);
+          'https://website.com/post/');
 })
