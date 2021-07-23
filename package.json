@@ -10,8 +10,7 @@
     "test:watch": "ava --watch",
     "coverage": "nyc npm run test",
     "build": "rm -rf dist && tsc",
-    "package": "cp -r package.json *.md dist/",
-    "prepublishOnly": "npm run build && npm run package"
+    "package": "cp -r package.json package-lock.json *.md dist/"
   },
   "ava": {
     "extensions": [
