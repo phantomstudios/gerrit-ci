@@ -40,6 +40,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run package
-      - run: npm publish dist/ --access=public
+      - run: cd dist
+      - run: npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
