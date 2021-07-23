@@ -117,7 +117,7 @@ Ecosystem Documentation https://pm2.keymetrics.io/docs/usage/application-declara
 ```bash
 $ pm2 start
 ```
-```json
+```js
 // ecosystem.config.js
 module.exports = {
   apps: [{
