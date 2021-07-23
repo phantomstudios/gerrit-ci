@@ -6,7 +6,7 @@ function parseJsonResponse(textResponse: string): unknown {
   return JSON.parse(textResponse.replace(antiHijack, ''));
 }
 
-const curlCommand = 'curl --silent -b ~/.gitcookies';
+const curlCommand = 'curl --silent -b `git config http.cookiefile`';
 
 export function get(url: string) {
   const {stdout} =
