@@ -115,24 +115,21 @@ $ npm install pm2@latest -g
 Ecosystem Documentation https://pm2.keymetrics.io/docs/usage/application-declaration/
 
 ```bash
-$ pm2 start ecosystem.config.json
+$ pm2 start
 ```
 ```json
-// ecosystem.config.json
-{
-  "apps": [
-    {
-      "script": "./index.ts",
-      "name": "foo-gerrit-ci",
-      "cwd": "/Users/alex/projects/foo-gerrit-ci/",
-      // @see https://crontab.guru/#*/5_*_*_*_*
-      "cron_restart": "*/5 * * * *",
-      // Add timestamp to logs
-      "time": true,
-      // Do not restart once the execution ends
-      "autorestart": false
-    }
-  ]
+// ecosystem.config.js
+module.exports = {
+  apps: [{
+    script: './index.ts',
+    name: 'foo-gerrit-ci',
+    // @see https://crontab.guru/#*/5_*_*_*_*
+    cron_restart: '*/5 * * * *',
+    // Add timestamp to logs
+    time: true,
+    // Do not restart once the execution ends
+    autorestart: false
+  }]
 }
 ```
 
@@ -152,8 +149,8 @@ npm install pm2@latest --save-dev
 ```json
 "scripts": {
   // ...
-  "ci:start": "pm2 start ecosystem.config.json",
-  "ci:stop": "pm2 delete ecosystem.config.json",
+  "ci:start": "pm2 start",
+  "ci:stop": "pm2 delete",
 
   // With some seasoning in your script you could also:
   // Run against a single CR [$ npm run ci:exec -- $GERRIT_ID]
