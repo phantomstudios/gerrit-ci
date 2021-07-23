@@ -29,9 +29,6 @@
     ],
     "check-coverage": true
   },
-  "publishConfig": {
-    "registry": "https://npm.phntms.com"
-  },
   "author": "alessio@phntms.com",
   "license": "ISC",
   "devDependencies": {
