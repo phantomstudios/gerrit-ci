@@ -26,14 +26,19 @@ const MOCK_REVIEW_LIST_PAYLOAD = [
   {branch: 'pham-bar', _number: 123403},
 ];
 
-function getReviewByIdCurlGetMocks(commentPayload?: unknown, patchset = 1) {
+function getReviewByIdCurlGetMocks(
+    commentPayload?: unknown, patchset = 1, ciApproved = false) {
+  const ciAccount = {_account_id: 12345};
+
   curlGetStub.resetHistory();
   // Avoid making assumptions about which arguments have been called with
   // This instead ensures that the calls are made in the right sequence
   curlGetStub.onCall(0).returns(commentPayload || {});
   curlGetStub.onCall(1).returns({
     messages: [{_revision_number: patchset}],
+    labels: {'Code-Review': ciApproved ? {approved: ciAccount} : {}},
   });
+  curlGetStub.onCall(2).returns(ciAccount);
 }
 
 const gerritApi = new GerritApiService('gerrit', 'namespace/project');
@@ -82,12 +87,20 @@ test('constructs the comment POST request URL', () => {
           'namespace%2Fproject~12345/revisions/1/review');
 });
 
-test('returns the latest CI comment and review patchset', ({is}) => {
+test('returns the latest CI comment and review patchset', (t) => {
   getReviewByIdCurlGetMocks(MOCK_REVIEW_PAYLOAD, 3);
-  const {patchset, ciPatchset} = gerritApi.getReviewById('12345');
+  const {patchset, ciApproved, ciPatchset} = gerritApi.getReviewById('12345');
 
-  is(patchset, '3');
-  is(ciPatchset, '2');
+  t.is(patchset, '3');
+  t.is(ciPatchset, '2');
+  t.false(ciApproved);
+});
+
+test('the "ciApproved" property is true on a CI approved review', (t) => {
+  getReviewByIdCurlGetMocks(MOCK_REVIEW_PAYLOAD, 3, /* ciApproved */ true);
+  const {ciApproved} = gerritApi.getReviewById('12345');
+
+  t.true(ciApproved);
 });
 
 test('returns the list of reviews with the specified branch filter', (t) => {

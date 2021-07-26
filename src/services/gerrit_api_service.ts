@@ -6,6 +6,8 @@ import * as curl from './curl_service';
  */
 export const CI_MAGIC_STRING = '[-]';
 
+const GET_CI_ACCOUNT_DETAILS_URL =
+    'https://agency-code-review.googlesource.com/accounts/self/detail';
 
 /** Review Overview */
 export interface ReviewListItem {
@@ -13,9 +15,17 @@ export interface ReviewListItem {
   id: string;
 }
 
+interface UserDetailsPayload {
+  email: string;
+  name: string;
+  registered_on: string;
+  secondary_emails: string[];
+  _account_id: number;
+}
+
 interface ReviewDetailsPayload {
   messages: {_revision_number: number}[];
-  labels: {'Code-Review': {approved?: {}}};
+  labels: {'Code-Review': {approved?: UserDetailsPayload}};
 }
 
 /** Review Details */
@@ -24,6 +34,7 @@ export interface GerritReview {
   ciPatchset?: string;
   id: string;
   isApproved: boolean;
+  ciApproved: boolean;
   noRunFlag?: boolean;
   patchset: string;
 }
@@ -76,9 +87,15 @@ export class GerritApiService {
     // Get last patchset from the review details
     const {labels, messages} = curl.get(detailsUrl) as ReviewDetailsPayload;
     const lastRevisionMessage = (messages|| []).reverse()[0];
+    const approvedUser = (labels || {})['Code-Review']?.approved;
+
+    // Get CI Account ID
+    const {_account_id: ciAccountId} =
+        curl.get(GET_CI_ACCOUNT_DETAILS_URL) as UserDetailsPayload || {};
 
     return {
-      isApproved: !!(labels || {})['Code-Review']?.approved,
+      isApproved: !!approvedUser,
+      ciApproved: !!approvedUser && ciAccountId === approvedUser._account_id,
       ciPatchset: lastCiComment?.patch_set,
       patchset: String(lastRevisionMessage?._revision_number || 1),
       id: gerritId,

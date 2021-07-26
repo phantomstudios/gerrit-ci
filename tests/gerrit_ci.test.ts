@@ -166,7 +166,7 @@ test('comments and votes -1 when the pipeline fails', () => {
       {message: expectedMessage, vote: -1});
 });
 
-test('Does not add a vote when pipeline succeed on an approved review', () => {
+test('Does not vote when the pipeline succeeds on a CI approved review', () => {
   const gerritCI = new GerritCI({
     repositoryUrl: 'https://gerrit.googlesource.com/project',
     targetBranch: 'master',
@@ -174,7 +174,7 @@ test('Does not add a vote when pipeline succeed on an approved review', () => {
   });
 
   execSyncStub.returns({toString: () => 'yay!'});
-  gerritApiStub.getReviewById.returns({isApproved: true, patchset: '1'});
+  gerritApiStub.getReviewById.returns({ciApproved: true, patchset: '1'});
   gerritCI.runSingleChange('12345');
 
   const expectedMessage = DEFAULT_SUCCESS_MESSAGE('npm run build');
